@@ -19,7 +19,10 @@ INNER JOIN Factura f ON
 	AND YEAR(f.fact_fecha) < 2012
 LEFT JOIN Composicion c ON
 	p.prod_codigo = c.comp_producto
-WHERE
+GROUP BY
+	p.prod_codigo,
+	p.prod_detalle
+HAVING 
 	p.prod_codigo NOT IN (
 	SELECT
 		DISTINCT i2.item_producto
@@ -31,9 +34,6 @@ WHERE
 		AND i2.item_numero = f2.fact_numero
 	WHERE
 		YEAR(f2.fact_fecha) = 2012)
-GROUP BY
-	p.prod_codigo,
-	p.prod_detalle
 ORDER BY
 	SUM(i.item_cantidad) DESC
 

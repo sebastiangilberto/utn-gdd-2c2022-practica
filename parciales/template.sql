@@ -218,3 +218,19 @@ FROM
 	cliente
 WHERE
 	clie_codigo = '00656'
+	
+/* OVER PARTITION */
+SELECT
+	ROW_NUMBER() OVER(ORDER BY name ASC) AS Row#,
+	name,
+	recovery_model_desc
+FROM
+	sys.databases
+WHERE
+	database_id < 5;
+
+SELECT 
+  ROW_NUMBER() OVER(PARTITION BY recovery_model_desc ORDER BY name ASC) 
+    AS Row#,
+  name, recovery_model_desc
+FROM sys.databases WHERE database_id < 5;
