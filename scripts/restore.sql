@@ -1,0 +1,1 @@
+RESTORE DATABASE GD2C2022PRACTICA FROM DISK=N'/var/opt/mssql/backup/GD2015C1.bak' WITH MOVE 'GESTION2009_Data' to '/var/opt/mssql/data/GESTION2022.mdf', MOVE 'GESTION2009_Log' to '/var/opt/mssql/data/GESTION2022_log.ldf', REPLACE, NOUNLOAD, STATS=10
