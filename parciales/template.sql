@@ -1,6 +1,7 @@
+/* CONSTRAINTS */
 ALTER TABLE STOCKADD CONSTRAINT const_negativo CHECK (stoc_cantidad >= 0)
 
--- ISOLATION LEVEL
+/* ISOLATION LEVELS */
 -- LEE DATOS SUCIOS
 SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
 -- LEE DATOS COMMITEADOS (YA SEA PERSISTIDOS O LOS PREVIOS SI HAY OTRO UPDATE EN PROCESO)
@@ -10,11 +11,17 @@ SET TRANSACTION ISOLATION LEVEL REPEATABLE READ
 -- READ/WRITE LOCK, TE DEJA LECTURA CONCURRENTE PERO EL PRIMER UPDATE SE BLOQUEA MIENTRAS SE ESTE LEYENDO
 SET TRANSACTION ISOLATION LEVEL SERIALIZABLE
 
+/* UTILES */
 -- DIFF EN PORCENTAJE ENTRE DOS NUMEROS
 SELECT  
 	100.0 * (curr.Val - prev.Val) / prev.Val As PercentDiff
 
--- FUNCTION
+-- OBTENER UN DATE USANDO LOS VALORES POR SEPARADO
+DATEFROMPARTS(2010, 1, 23)
+DECLARE @fecha_prueba DATE
+SELECT @fecha_prueba = DATEFROMPARTS(2010, 1, 23)
+
+/* FUNCTION */
 CREATE FUNCTION fx_nombre(@param1 DATETIME, @param2 NVARCHAR(50))
 RETURNS VARCHAR(2) AS
 BEGIN
@@ -50,7 +57,27 @@ BEGIN
 RETURN 'ME'
 END
 
--- TRIGGER
+-- EJEMPLO 2 DEVOLVIENDO UNA TABLA
+create function fnc_tabla1 (@codigo char(6))RETURNS TABLE AS
+BEGIN
+RETURN (
+	SELECT
+		*
+	FROM
+		CLIENTE
+	WHERE
+		clie_codigo != @codigo
+	)
+END
+
+SELECT
+	*
+FROM
+	DBO.fnc_tabla1 ('00000')
+JOIN
+
+/* TRIGGERS*/
+
 CREATE OR ALTER TRIGGER tr_nombre
 ON Tabla
 AFTER INSERT, UPDATE
@@ -74,7 +101,7 @@ BEGIN
 	
 END
 
--- STORE PROCEDURE
+/* STORE PROCEDURE */
 CREATE OR ALTER PROCEDURE sp_nombre(@param_input INTEGER, @param_output NUMERIC(6,0) OUTPUT) AS
 BEGIN
 	IF @param_input > 10
@@ -93,8 +120,9 @@ EXEC dbo.sp_nombre @param_output = @result OUTPUT
 SELECT @result AS [Param Output Store]
 
 
--- CURSOR
+/* CURSOR */
 
+-- EJEMPLO 1
 BEGIN
 
 	DECLARE	@codigo CHAR(6), @razon_social CHAR(100)
@@ -123,6 +151,7 @@ BEGIN
 	DEALLOCATE mi_cursor
 END
 
+-- EJEMPLO 2
 BEGIN
 
 	DECLARE	@codigo CHAR(6), @razon_social CHAR(100)
@@ -158,3 +187,34 @@ BEGIN
 	CLOSE mi_cursor
 	DEALLOCATE mi_cursor
 END
+
+
+/* VIEWS */
+-- CREACION/MODIFICACION
+CREATE OR ALTER VIEW v_nombre (cliente, total_comprado)AS
+SELECT
+	fact_cliente,
+	sum(fact_total)
+FROM
+	Factura f
+GROUP BY
+	fact_cliente
+	
+-- CONSULTA
+SELECT
+	*
+FROM
+	v_nombre
+
+-- UPDATE
+UPDATE
+	v_nombre nombre = 'xxxx10'
+where
+	cliente = '00656'
+	
+SELECT
+	*
+FROM
+	cliente
+WHERE
+	clie_codigo = '00656'
